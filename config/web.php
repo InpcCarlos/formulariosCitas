@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+require __DIR__ . '/constants.php';
 
 $config = [
     'id' => 'basic',
@@ -31,7 +32,11 @@ $config = [
             'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@app/mail',
             // send all mails to a file by default.
-            'useFileTransport' => true,
+            'useFileTransport' => false,
+            'transport' => [             
+                'dsn' => 'smtp://notificacion.cai@patrimoniocultural.gob.ec:Ncai.2025%2A@mail.patrimoniocultural.gob.ec:465', // Usar el formato DSN
+                'encryption' => 'ssl',
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

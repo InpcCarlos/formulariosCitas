@@ -14,6 +14,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use yii\swiftmailer\Mailer;
 
 /**
  * FormDatosFacturacionController implements the CRUD actions for FormDatosFacturacion model.
@@ -158,6 +159,8 @@ class FormDatosFacturacionController extends Controller
                         }
                     }
                     $transaction->commit();
+                    $this-> actionSendNotification($model, $detalleVisitantes);
+                    
                     Yii::$app->session->setFlash('success', 'Los datos se almacenaron con éxito.');
                     return $this->refresh();
                 } else {
@@ -276,6 +279,60 @@ class FormDatosFacturacionController extends Controller
         } else {
             return ['precio' => 0]; // o cualquier valor por defecto
         }
+    }
+    /*
+     * Función para enviar un email al usuario que factura
+     */
+    public function actionSendNotification($model, $detalleVisitantes)
+    {
+        $subject = EMAIL_SUBJECT;
+        $nombre_usuario = $model->form_dnombres_completos;
+        $fecha_compra = $model->form_dfecha;
+        $listaCantidad = "";
+        $totalCantidad = 0;
+        foreach ($detalleVisitantes as $detalleVisitante) {
+            $modelTipoVisitante = FormTipoVisitante::findOne($detalleVisitante->form_dvtipo_visitante);
+            $nombreSeleccionado = $modelTipoVisitante ? $modelTipoVisitante->form_tvnombre : null;
+            $listaCantidad .= "- $nombreSeleccionado: $detalleVisitante->form_dvcantidad\n";
+            $totalCantidad += $detalleVisitante->form_dvcantidad;
+        };
+        $cantidad_boletos = $totalCantidad;
+        $monto_total = $model->form_dtotal;
+        $telefono_contacto = Yii::$app->params['contactoINPC'];
+
+        $lista = rtrim($listaCantidad, ", "); 
+        $body = <<<EOT
+        Estimado/a $nombre_usuario,
+
+        Reciba un cordial saludo.
+
+        Por medio de la presente, le notificamos que su compra de boletos para el **Complejo Arqueológico Ingapirca** ha sido procesada exitosamente. A continuación, encontrará los detalles de su transacción:
+
+        - **Fecha de compra:** $fecha_compra
+        - **Cantidad de boletos:** $cantidad_boletos
+        $lista
+        - **Monto total:** $ $monto_total
+
+        Si requiere asistencia o tiene alguna inquietud, no dude en contactarnos al teléfono $telefono_contacto.
+
+        Agradecemos su visita y esperamos que disfrute de su experiencia en el Complejo Arqueológico Ingapirca.
+
+        Atentamente,
+
+        **Equipo CAI**
+        Teléfono: $telefono_contacto
+        EOT;
+
+        Yii::$app->mailer->compose()
+            ->setTo($model->form_dcorreo)  // Dirección de correo del destinatario
+            ->setFrom(Yii::$app->params['caiEmail'])  // Dirección de correo de envío
+            ->setSubject($subject)
+            ->setTextBody($body)  // Cuerpo del mensaje (puedes usar HTML también con setHtmlBody())
+            ->send();
+
+        // Redirigir a otra página o mostrar un mensaje de éxito
+        Yii::$app->session->setFlash('success', 'Correo enviado correctamente.');
+        return $this->redirect(['index']);  // O la vista que desees
     }
     
        

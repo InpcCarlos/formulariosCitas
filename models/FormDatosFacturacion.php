@@ -41,7 +41,7 @@ class FormDatosFacturacion extends \yii\db\ActiveRecord
             [['form_dnombres_completos', 'form_ddireccion'], 'string', 'max' => 200],
             [['form_registro_operadora'], 'string', 'max' => 100],            
             [['form_dcedula'], 'string', 'max' => 150],
-            [['form_dtelefono', 'form_dcorreo'], 'string', 'max' => 30],            
+            [['form_dtelefono', 'form_dcorreo'], 'string', 'max' => 50],            
             [['form_dcorreo'], 'email','message' => 'La dirección de correo no es válida.'],
             [['form_adjunto'], 'file', 'skipOnEmpty' => true],
             [['form_dtotal'], 'number'],
