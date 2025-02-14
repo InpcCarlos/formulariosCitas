@@ -10,6 +10,7 @@ use Yii;
  * @property int $form_cid
  * @property int|null $form_hid
  * @property int|null $form_did
+ * @property int $form_dccantidad
  * @property string|null $form_cfecha
  *
  * @property FormDatosFacturacion $formD
@@ -32,7 +33,7 @@ class FormDatosCitas extends \yii\db\ActiveRecord
     {
         return [
             [['form_hid', 'form_did'], 'default', 'value' => null],
-            [['form_hid', 'form_did'], 'integer'],
+            [['form_hid', 'form_did','form_dccantidad'], 'integer'],
             [['form_cfecha'], 'safe'],
             [['form_did'], 'exist', 'skipOnError' => true, 'targetClass' => FormDatosFacturacion::class, 'targetAttribute' => ['form_did' => 'form_did']],
             [['form_hid'], 'exist', 'skipOnError' => true, 'targetClass' => FormHorarios::class, 'targetAttribute' => ['form_hid' => 'form_hid']],

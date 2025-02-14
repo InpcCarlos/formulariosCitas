@@ -88,9 +88,7 @@ $this->registerJs($js);
         </tr>
         <tr>
             <td>FECHA DE VISITA:</td><td><?= $form->field($model, 'form_dfecha_visita',['inputOptions' => ['type'=>'date','required'=>true,"onchange"=>'poblarHorarios(this);','min'=>date('Y-m-d')]])->textInput()->label(false) ?> </td>    
-            <td>HORA DE VISITA:</td><td><?= $form->field($model, 'form_dhora_visita')->dropDownList(\yii\helpers\ArrayHelper::map(app\models\FormHorarios::find()->orderBy(['form_hid' => SORT_ASC])->all(),
-                                    "form_hid","form_hnombre"),
-                                    ["prompt"=>"Seleccione una opción",'required'=>true,"onchange"=>'poblarTarifario(this);'])->label(false) ?></td>
+            <td>HORA DE VISITA:</td><td><?= $form->field($model, 'form_dhora_visita')->dropDownList([], ["prompt"=>"Seleccione una opción",'required'=>true,"onchange"=>'poblarTarifario(this);'])->label(false) ?></td>
         </tr>
     </table>
 
@@ -169,7 +167,7 @@ $this->registerJs($js);
                                     ["prompt"=>"Seleccione una opción",'required'=>true])->label(false) ?></td>
                         <!--<td><?= $form->field($detalleVisitante, "[{$i}]form_dvfecha_nacimiento",['inputOptions' => ['type'=>'date','required'=>true,'max'=>date('Y-m-d')]])->textInput()->label(false) ?> </td>
                         -->
-                        <td><?= $form->field($detalleVisitante, "[{$i}]form_dvcantidad")->textInput(['maxlength' => true,"onblur"=>'calcularPrecio(this);'])->label(false) ?></td>
+                        <td><?= $form->field($detalleVisitante, "[{$i}]form_dvcantidad")->textInput(['maxlength' => true,'class' => 'cantidad-total',"onblur"=>'calcularPrecio(this);'])->label(false) ?></td>
                         <td><?= $form->field($detalleVisitante, "[{$i}]form_dvprecio")->textInput(['maxlength' => true])->label(false) ?></td>
                         <td><?= $form->field($detalleVisitante, "[{$i}]form_dvprecio_total")->textInput(['maxlength' => true,'class' => 'precio-total'])->label(false) ?></td>
                         <td>                            
@@ -184,7 +182,9 @@ $this->registerJs($js);
                 <td><button type="button" class="add-item btn btn-success btn-sm"><span class="fa fa-plus"></span>Nuevo</button></td>
             </tr>
             <tr>
-                    <td colspan="6">TOTAL A PAGAR ($)</td><td colspan="3"><?= $form->field($model, 'form_dtotal')->textInput(['maxlength' => 10])->label(false) ?></td>
+                    <td colspan="6">TOTAL A PAGAR ($)</td>
+                    <td><?= $form->field($model, 'form_dtcantidad')->textInput(['maxlength' => 10])->label(false) ?></td>
+                    <td colspan="3"><?= $form->field($model, 'form_dtotal')->textInput(['maxlength' => 10])->label(false) ?></td>
                 </tr>
         </tfoot>
         </table>

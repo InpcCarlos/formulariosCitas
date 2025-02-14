@@ -142,15 +142,13 @@ class FormDatosFacturacionController extends Controller
                 }
             } else {
                 Yii::error("El archivo adjunto no es una instancia de UploadedFile.");
-            }
-
-                    
-                                        
+            }                                                            
                     /** Almacenar información de citas */
                     foreach ($datosCitas as $datosCita) {
                         $datosCita->form_did = $model->form_did;
                         $datosCita->form_hid = $model->form_dhora_visita;
                         $datosCita->form_cfecha = $model->form_dfecha_visita;
+                        $datosCita->form_dccantidad = $model->form_dtcantidad;
                         Yii::info("Guardando datos de cita con form_did: " . $datosCita->form_did);
                         if (!($datosCita->save(false))) {
                             $transaction->rollBack();
@@ -247,20 +245,16 @@ class FormDatosFacturacionController extends Controller
                     ->andWhere(['=', 'form_hoperadora', $val_opera])                                
                     ->orderBy(['form_hid' => SORT_ASC])
                     ->all();
-        $html="<option value=''>Seleccione un horario</option>"; 
-         
+        $html="<option value=''>Seleccione un horario</option>";          
         if(count($horario)>0){           
-            foreach($horario AS $clave){
-                //print $clave->form_hid;
-                
+            foreach($horario AS $clave){                                
                 $cita = FormDatosCitas::find()
                     ->where(['=', 'form_cfecha', $id_val])
                     ->andWhere(['=', 'form_hid', $clave->form_hid])
-                    ->count(); 
+                    ->sum('form_dccantidad'); 
                     $turno_d =5-$cita;
                     if($turno_d<1)continue;
                     $html .= "<option value='".$clave->form_hid."'>".$clave->form_hnombre." - ".$turno_d." boletos </option>";                    
-
             }
              }else{
                    $html .="<option value=''></option>";
@@ -334,6 +328,14 @@ class FormDatosFacturacionController extends Controller
         Yii::$app->session->setFlash('success', 'Correo enviado correctamente.');
         return $this->redirect(['index']);  // O la vista que desees
     }
-    
-       
+    public function actionChangeStatus($id)
+    {
+        $model = $this->findModel($id);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+        return $this->renderAjax('_changeStatusForm', [
+            'model' => $model,
+        ]);
+    }       
 }
